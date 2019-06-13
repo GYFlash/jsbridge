@@ -4,11 +4,7 @@ JSBridge.prototype.log = function (id, message) {
         document.getElementById(id).innerHTML += '<p> <span style="color: #000;background-color: red;padding: 0 10px;">>:</span>&nbsp;&nbsp;&nbsp;'+message+'</p><br>';
     }
 };
-JSBridge.prototype.clearLog = function () {
-    if (document.getElementById('bridgeLog')) {
-        document.getElementById('bridgeLog').innerHTML = null;
-    }
-};
+
 JSBridge.prototype.osName = function () {
     var u = navigator.userAgent;
     if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) {
@@ -24,13 +20,10 @@ JSBridge.prototype.osName = function () {
     }
 };
 JSBridge.prototype.connect = function (callback) {
-    this.log(this.osName());
     if (window.WebViewJavascriptBridge) {
-        this.log('Bridge');
         return callback(WebViewJavascriptBridge)
     }
     if (this.osName() === 'iOS' || this.osName() === 'iPad') {
-        this.log('iOS');
         if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
         window.WVJBCallbacks = [callback];
         var WVJBIframe = document.createElement('iframe');
