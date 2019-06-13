@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>JSBridge</title>
+  <style>
+    p {
+      margin: 0;
+    }
+    .input-row {
+      margin-bottom: 10px;
+    }
+    #log {
+      background-color: #f3f3f3;
+      border: 1px solid gainsboro;
+      height: 400px;
+      overflow: auto;
+      color: gray;
+      font-size: 12px;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    input {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      border: 1px solid gainsboro;
+      padding: 10px 5px;
+    }
+  </style>
+</head>
+<body>
+<div class="input-row">
+  <label>姓名: <input type="text" name="name" id="name" value="tom"></label>
+</div>
+<div class="input-row">
+  <label>年龄: <input type="number" name="age" id="age" value="18"></label>
+</div>
+<div>
+  <button id="jsRunNative">js 调用 原生</button>
+</div>
+<div id="log"></div>
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="JSBridge.js"></script>
+<script>
+  var jsBridge = new JSBridge();
+  jsBridge.log('log', 'jsBridge 开始链接...');
+
+  jsBridge.connect(function (bridge) {
+      jsBridge.log('log', 'jsBridge 链接成功');
+      $('#jsRunNative').click(function () {
+          var name = $('input[name=name]').val();
+          var age = $('input[name=age]').val();
+          var params = {
+              name: name,
+              age: age
+          };
+          var code = document.createElement('code');
+          code.innerHTML = 'js run native ' + JSON.stringify(params) + '<br><br>';
+          $('#log').append(code);
+          bridge.callHandler('jsRunNative', params, function (res) {
+              var code = document.createElement('code');
+              code.innerHTML = 'native callback js ' + JSON.stringify(res) + '<br><br>';
+              $('#log').append(code);
+          });
+          bridge.registerHandler('nativeRunJs', function (data, callback) {
+              var code = document.createElement('code');
+              code.innerHTML = 'native run js ' + JSON.stringify(data) + '<br><br>';
+              $('#log').append(code);
+              if (callback) {
+                  callback('native run js success')
+              }
+          })
+      });
+  });
+
+  // $('#jsRunNative').click(function () {
+  //     var name = $('input[name=name]').val();
+  //     var age = $('input[name=age]').val();
+  //     var params = {
+  //         name: name,
+  //         age: age
+  //     };
+  //     console.log(JSON.stringify(params));
+  //     var code = document.createElement('code');
+  //     code.innerHTML = 'js run native ' + JSON.stringify(params) + '<br><br>';
+  //     $('#log').append(code);
+  // });
+</script>
+</body>
+</html>
